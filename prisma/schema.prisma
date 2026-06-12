@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Customer {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String?
+  city        String?
+  tags        String[] @default([])
+  totalSpend  Float    @default(0)
+  orderCount  Int      @default(0)
+  lastOrderAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders         Order[]
+  communications Communication[]
+}
+
+model Order {
+  id         String   @id @default(cuid())
+  customerId String
+  amount     Float
+  items      Json
+  channel    String   @default("online")
+  status     String   @default("completed")
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model Segment {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  filters     Json
+  aiPrompt    String?
+  customerIds String[] @default([])
+  createdAt   DateTime @default(now())
+
+  campaigns Campaign[]
+}
+
+model Campaign {
+  id          String    @id @default(cuid())
+  name        String
+  segmentId   String
+  channel     String
+  messageBody String
+  status      String    @default("draft")
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+
+  segment        Segment         @relation(fields: [segmentId], references: [id])
+  communications Communication[]
+}
+
+model Communication {
+  id          String    @id @default(cuid())
+  campaignId  String
+  customerId  String
+  channel     String
+  messageBody String
+  status      String    @default("pending")
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  failedAt    DateTime?
+  createdAt   DateTime  @default(now())
+
+  campaign Campaign @relation(fields: [campaignId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+}
