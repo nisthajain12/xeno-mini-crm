@@ -4,7 +4,7 @@ import { defineConfig } from 'prisma/config'
 export default defineConfig({
   schema: path.join('prisma', 'schema.prisma'),
   datasource: {
-    url: process.env.DATABASE_URL ?? 'postgresql://placeholder:placeholder@localhost:5432/placeholder',
+    url: process.env.DATABASE_URL || 'postgresql://placeholder@localhost/placeholder',
   },
   migrations: {
     seed: 'tsx prisma/seed.ts',
