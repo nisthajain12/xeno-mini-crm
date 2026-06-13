@@ -10,7 +10,21 @@ async function getAnalytics() {
     },
   })
 
-  return campaigns.map(c => {
+  return campaigns.map((c: {
+  id: string
+  name: string
+  channel: string
+  status: string
+  createdAt: Date
+  segment: { name: string }
+  communications: {
+    status: string
+    deliveredAt: Date | null
+    openedAt: Date | null
+    clickedAt: Date | null
+    failedAt: Date | null
+  }[]
+}) => {
     const total = c.communications.length
     const sent = c.communications.filter(x => x.status !== 'pending').length
     const delivered = c.communications.filter(x => x.deliveredAt).length
