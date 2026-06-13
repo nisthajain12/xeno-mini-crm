@@ -1,10 +1,10 @@
-import 'dotenv/config'
-import { defineConfig, env } from 'prisma/config'
+import path from 'node:path'
+import { defineConfig } from 'prisma/config'
 
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: path.join('prisma', 'schema.prisma'),
   datasource: {
-    url: env('DATABASE_URL'),
+    url: process.env.DATABASE_URL ?? 'postgresql://placeholder:placeholder@localhost:5432/placeholder',
   },
   migrations: {
     seed: 'tsx prisma/seed.ts',
