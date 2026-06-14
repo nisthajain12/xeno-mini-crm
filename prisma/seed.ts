@@ -1,7 +1,8 @@
 import 'dotenv/config'
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const { PrismaClient } = require('@prisma/client')
+
 import { PrismaNeon } from '@prisma/adapter-neon'
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const PrismaClient = require('@prisma/client').PrismaClient
 
 const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! })
 const prisma = new PrismaClient({ adapter })
