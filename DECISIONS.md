@@ -82,137 +82,26 @@ Mirrors production architecture. In real life the channel service would be a com
 ---
 
 ## Architecture Diagram
-┌─────────────────────────────────┐
 
-│         Next.js CRM App         │
-
-│      (Vercel)                   │
-
-│                                 │
-
-│  Pages:                         │
-
-│  / Dashboard                    │
-
-│  /customers                     │
-
-│  /segments                      │
-
-│  /campaigns                     │
-
-│  /analytics                     │
-
-│  /copilot                       │
-
-│                                 │
-
-│  APIs:                          │
-
-│  /api/customers                 │
-
-│  /api/segments                  │
-
-│  /api/segments/preview          │
-
-│  /api/campaigns                 │
-
-│  /api/campaigns/[id]/send       │
-
-│  /api/receipts ◄────────────────┼──┐
-
-│  /api/ai/segment                │  │
-
-│  /api/ai/message                │  │ async
-
-│  /api/ai/copilot                │  │ callbacks
-
-└──────────────┬──────────────────┘  │
-
-│ POST /send          │
-
-▼                     │
-
-┌─────────────────────────────────┐  │
-
-│      Channel Stub Service       │──┘
-
-│      (Vercel)                   │
-
-│                                 │
-
-│  POST /send → accepts message   │
-
-│  Waits 1-4 seconds              │
-
-│  POSTs back: delivered/opened/  │
-
-│  clicked/failed                 │
-
-│                                 │
-
-│  Failure rate: 5%               │
-
-│  Open rate: ~85%                │
-
-│  Click rate: ~45%               │
-
-└─────────────────────────────────┘
-
-│
-
-▼
-
-┌─────────────────────────────────┐
-
-│     PostgreSQL on Neon          │
-
-│                                 │
-
-│  Customer                       │
-
-│    id, name, email, phone       │
-
-│    city, tags[], totalSpend     │
-
-│    orderCount, lastOrderAt      │
-
-│                                 │
-
-│  Order                          │
-
-│    id, customerId, amount       │
-
-│    items (JSON), channel        │
-
-│                                 │
-
-│  Segment                        │
-
-│    id, name, filters (JSON)     │
-
-│    customerIds[]                │
-
-│                                 │
-
-│  Campaign                       │
-
-│    id, name, segmentId          │
-
-│    channel, messageBody         │
-
-│    status, sentAt               │
-
-│                                 │
-
-│  Communication                  │
-
-│    id, campaignId, customerId   │
-
-│    status, sentAt, deliveredAt  │
-
-│    openedAt, clickedAt, failedAt│
-
-└─────────────────────────────────┘
+```mermaid
+flowchart TD
+    A[Marketer] -->|Dashboard/Segments/Campaigns/Copilot| B[CRM App\nNext.js on Vercel]
+    
+    B -->|Read/Write| C[(PostgreSQL on Neon\nCustomer, Order\nSegment, Campaign\nCommunication)]
+    
+    B -->|NL to filters\nMessage drafting\nCampaign planning| E[Google Gemini\n2.5 Flash Lite]
+    
+    B -->|1 POST /send per customer| D[Channel Stub\nExpress on Vercel]
+    
+    D -->|2 accepted: true| B
+    D -->|3 after 1-4s: delivered| F[/api/receipts]
+    D -->|4 after 2s: opened| F
+    D -->|5 after 4s: clicked or failed| F
+    
+    F -->|Updates status + timestamp| C
+    
+    C -->|Analytics query| G[Analytics Page\nDelivery/Open/Click rates]
+```
 ---
 
 ## What I'm Most Proud Of

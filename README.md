@@ -17,19 +17,16 @@ Built for the Xeno Engineering Take-Home Assignment.
 - **Analytics** — delivery, open, click, fail rates per campaign
 
 ## Architecture
-CRM App (Next.js) ──POST /send──► Channel Stub Service
 
-▲                                    │
+```mermaid
+flowchart TD
+    A[Marketer] -->|Uses| B[CRM App\nNext.js on Vercel]
+    B -->|Queries| C[(PostgreSQL\non Neon)]
+    B -->|POST /send| D[Channel Stub\nExpress on Vercel]
+    D -->|async callback\ndelivered/opened/clicked/failed| B
+    B -->|AI requests| E[Google Gemini API]
+```
 
-└────────async callbacks─────────────┘
-
-(delivered, opened, clicked, failed)
-
-│
-
-▼
-
-PostgreSQL (Neon)
 Two services deployed independently:
 - **CRM**: [xeno-mini-crm-eight.vercel.app](https://xeno-mini-crm-eight.vercel.app)
 - **Channel Stub**: [xeno-channel-stub-theta.vercel.app](https://xeno-channel-stub-theta.vercel.app)
