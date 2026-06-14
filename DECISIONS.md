@@ -85,24 +85,31 @@ Mirrors production architecture. In real life the channel service would be a com
 
 ```mermaid
 flowchart TD
-    A[Marketer] -->|Dashboard/Segments/Campaigns/Copilot| B[CRM App\nNext.js on Vercel]
-    
-    B -->|Read/Write| C[(PostgreSQL on Neon\nCustomer, Order\nSegment, Campaign\nCommunication)]
-    
-    B -->|NL to filters\nMessage drafting\nCampaign planning| E[Google Gemini\n2.5 Flash Lite]
-    
-    B -->|1 POST /send per customer| D[Channel Stub\nExpress on Vercel]
-    
-    D -->|2 accepted: true| B
-    D -->|3 after 1-4s: delivered| F[/api/receipts]
-    D -->|4 after 2s: opened| F
-    D -->|5 after 4s: clicked or failed| F
-    
-    F -->|Updates status + timestamp| C
-    
-    C -->|Analytics query| G[Analytics Page\nDelivery/Open/Click rates]
-```
+    A["Marketer"]
+    B["CRM App<br/>Next.js on Vercel"]
+    C["PostgreSQL on Neon<br/>Customer, Order<br/>Segment, Campaign<br/>Communication"]
+    D["Channel Stub<br/>Express on Vercel"]
+    E["Google Gemini<br/>2.5 Flash Lite"]
+    F["Receipt API<br/>/api/receipts"]
+    G["Analytics Page<br/>Delivery/Open/Click Rates"]
 
+    A -->|"Dashboard, Segments, Campaigns, Copilot"| B
+
+    B -->|"Read / Write"| C
+
+    B -->|"NL to Filters<br/>Message Drafting<br/>Campaign Planning"| E
+
+    B -->|"Send Message Request"| D
+
+    D -->|"Accepted Response"| B
+    D -->|"Delivered Event"| F
+    D -->|"Opened Event"| F
+    D -->|"Clicked or Failed Event"| F
+
+    F -->|"Update Status & Timestamps"| C
+
+    C -->|"Analytics Queries"| G
+```
 ---
 
 ## What I'm Most Proud Of
