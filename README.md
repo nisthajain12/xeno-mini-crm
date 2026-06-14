@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Xeno Mini CRM
 
-## Getting Started
+An AI-native Mini CRM for consumer brands to reach their shoppers with personalised campaigns.
 
-First, run the development server:
+Built for the Xeno Engineering Take-Home Assignment.
+
+## Live Demo
+🚀 **[xeno-mini-crm-eight.vercel.app](https://xeno-mini-crm-eight.vercel.app)**
+
+## What it does
+- **Ingest** customer and order data
+- **Segment** shoppers by behaviour (spend, recency, tags, city)
+- **AI Segment Builder** — describe your audience in plain English
+- **Send campaigns** across Email, WhatsApp, SMS, RCS
+- **AI Message Writer** — drafts personalised copy per segment
+- **AI Co-pilot** — describe a goal, AI plans and creates the campaign
+- **Analytics** — delivery, open, click, fail rates per campaign
+
+## Architecture
+CRM App (Next.js) ──POST /send──► Channel Stub Service
+
+▲                                    │
+
+└────────async callbacks─────────────┘
+
+(delivered, opened, clicked, failed)
+
+│
+
+▼
+
+PostgreSQL (Neon)
+Two services deployed independently:
+- **CRM**: [xeno-mini-crm-eight.vercel.app](https://xeno-mini-crm-eight.vercel.app)
+- **Channel Stub**: [xeno-channel-stub-theta.vercel.app](https://xeno-channel-stub-theta.vercel.app)
+
+## Tech Stack
+- **Frontend/Backend**: Next.js 16 (App Router) + TypeScript
+- **Database**: PostgreSQL on Neon via Prisma 7
+- **AI**: Google Gemini 2.5 Flash Lite
+- **Styling**: Tailwind CSS
+- **Deployment**: Vercel
+
+## Key Design Decisions
+- **Two-service architecture** mirrors real messaging providers (Twilio, Gupshup)
+- **Async callback loop** simulates full delivery lifecycle
+- **AI woven into core workflows** — not bolted on
+- **Serverless-compatible** Prisma adapter for Neon
+
+## Local Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repo
+git clone https://github.com/nisthajain12/xeno-mini-crm.git
+cd xeno-mini-crm
+
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env
+# Add DATABASE_URL, GEMINI_API_KEY
+
+# Push schema and seed data
+npx prisma db push
+npx prisma db seed
+
+# Run the app
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Also run the channel stub:
+```bash
+git clone https://github.com/nisthajain12/xeno-channel-stub.git
+cd xeno-channel-stub
+pnpm install
+pnpm dev
+```
